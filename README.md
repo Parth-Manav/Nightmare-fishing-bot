@@ -50,6 +50,13 @@ A professional Discord bot featuring an interactive daily fishing game. Users ca
 | `/setsummarychannel` | Sets the channel where daily summaries are posted. | Admin |
 | `/fishsummary` | Manually triggers a summary of who hasn't fished today. | Admin |
 | `/togglereminder` | Toggles pinging users in the daily summary. | Admin |
+| `/setreminderthreshold` | Sets the days of inactivity before a user is pinged. | Admin |
+
+## Inactivity Threshold
+By default, the bot pings tracked members if they haven't fished **today** (1 day). You can change this using `/setreminderthreshold`.
+- **Example**: `/setreminderthreshold days:3`
+- **Result**: Members will only be pinged if they haven't fished for **3 consecutive days**.
+- This allows for a more relaxed community where daily fishing isn't mandatory to avoid pings.
 
 ## Project Structure
 
