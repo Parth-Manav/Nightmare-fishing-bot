@@ -232,6 +232,7 @@ class FishingManager {
             .setColor(0x0099FF) // Blue
             .setTitle('🎣 Catch of the Day!')
             .setDescription(`**${username}** cast their line and caught a fish! 🐟`)
+            .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true }))
             .addFields(
                 { name: '🔥 Streak', value: `${currentStreak} Days`, inline: true },
                 { name: '✨ Total Catches', value: `${totalCatches}`, inline: true }
