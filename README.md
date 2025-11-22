@@ -5,11 +5,13 @@ A professional Discord bot featuring an interactive daily fishing game. Users ca
 ## Features
 
 - **Daily Fishing**: Interactive "Fish!" button with a 24-hour cooldown.
+- **Beautiful Visuals**: Rich Embed cards with user avatars and gold/blue themes.
+- **Smart Timezones**: Timestamps automatically adapt to each user's local time.
 - **Streak System**: Tracks consecutive days fished.
 - **Leaderboards**: Recognizes the "Best Anglers" with high streaks.
 - **Role Tracking**: Optional feature to track specific roles (e.g., "Verified Members") and see who hasn't fished.
 - **Daily Summaries**: Automated daily report of total catches and missing members.
-- **Data Safety**: Robust data management with automatic backups to prevent data loss.
+- **Optimized Performance**: Efficient data handling with smart backups.
 
 ## Installation
 
