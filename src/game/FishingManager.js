@@ -236,7 +236,8 @@ class FishingManager {
             .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true }))
             .addFields(
                 { name: '🔥 Streak', value: `${currentStreak} Days`, inline: true },
-                { name: '✨ Total Catches', value: `${totalCatches}`, inline: true }
+                { name: '✨ Total Catches', value: `${totalCatches}`, inline: true },
+                { name: '🌍 Total Catches Today', value: `${data.dailyCount}`, inline: true }
             )
             .setTimestamp()
             .setFooter({ text: 'Stardust Pond' });
