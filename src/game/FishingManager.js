@@ -1,6 +1,6 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const dataManager = require('../data/DataManager');
-const { getDateString, getYesterdayDateString, shouldReset } = require('../utils/timeUtils');
+const { getDateString, getYesterdayDateString, shouldReset, getDaysDifference } = require('../utils/timeUtils');
 
 class FishingManager {
     constructor() {
@@ -24,6 +24,7 @@ class FishingManager {
             }
 
             const totalCatches = data.dailyCount;
+            const todayDate = getDateString(Date.now());
 
             let guildMembers = null;
             if (data.trackedRoleId) {
@@ -37,12 +38,39 @@ class FishingManager {
             if (data.trackedRoleId) {
                 const role = await guild.roles.fetch(data.trackedRoleId);
                 if (role) {
-                    nonFishers = Array.from(role.members.filter(member => !fishedTodayIds.includes(member.id)).values());
+                    // Filter members who haven't fished today AND meet the inactivity threshold
+                    nonFishers = Array.from(role.members.filter(member => {
+                        // If they fished today, they are safe
+                        if (fishedTodayIds.includes(member.id)) return false;
+
+                        // If they haven't fished today, check how long it's been
+                        const userData = data.persistentUsers[member.id];
+
+                        // If they have never fished, they are inactive (infinite days > threshold)
+                        if (!userData) return true;
+
+                        // Calculate days since last fish
+                        const lastFishedDate = userData.lastFishedDate;
+                        const daysDiff = getDaysDifference(lastFishedDate, todayDate);
+
+                        // If days since last fish >= threshold, ping them
+                        return daysDiff >= data.reminderThreshold;
+                    }).values());
+
                     missedCount = nonFishers.length;
                 }
             } else {
+                // Fallback logic for no role (based on persistent users)
                 const persistentUserIds = Object.keys(data.persistentUsers);
-                const nonFishingPersistent = persistentUserIds.filter(id => !fishedTodayIds.includes(id));
+                const nonFishingPersistent = persistentUserIds.filter(id => {
+                    if (fishedTodayIds.includes(id)) return false;
+
+                    const userData = data.persistentUsers[id];
+                    const lastFishedDate = userData.lastFishedDate;
+                    const daysDiff = getDaysDifference(lastFishedDate, todayDate);
+
+                    return daysDiff >= data.reminderThreshold;
+                });
                 missedCount = nonFishingPersistent.length;
             }
 

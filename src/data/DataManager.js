@@ -18,7 +18,8 @@ class DataManager {
             summaryChannelId: null,
             guildId: null,
             pingReminderEnabled: true,
-            bestAnglerStreak: 5
+            bestAnglerStreak: 5,
+            reminderThreshold: 1
         };
 
         // Ensure backup directory exists
@@ -43,6 +44,10 @@ class DataManager {
 
                 if (typeof this.data.bestAnglerStreak === 'undefined') {
                     this.data.bestAnglerStreak = 5;
+                }
+
+                if (typeof this.data.reminderThreshold === 'undefined') {
+                    this.data.reminderThreshold = 1;
                 }
 
                 if (this.data.lastReset && !this.data.lastResetTimestamp) {
