@@ -1,0 +1,23 @@
+{
+  "name": "stardust-pond-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "fishing",
+    "game"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "A Discord bot with an interactive daily fishing game.",
+  "dependencies": {
+    "discord.js": "^14.24.2",
+    "dotenv": "^17.2.3",
+    "node-cron": "^4.2.1"
+  }
+}

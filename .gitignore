@@ -1,0 +1,4 @@
+node_modules/
+fishing_data.json
+.env
+*.log
