@@ -66,9 +66,6 @@ class DataManager {
 
     saveData() {
         try {
-            // Create a backup before saving
-            this.backupData();
-
             fs.writeFileSync(DATA_FILE, JSON.stringify(this.data, null, 2));
         } catch (error) {
             console.error('Error saving data:', error);

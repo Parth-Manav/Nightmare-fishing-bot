@@ -1,4 +1,7 @@
-require('dotenv').config(); // Ensure dotenv is loaded if used locally
+require('dotenv').config(); // Load data
+const dataManager = require('./src/data/DataManager');
+dataManager.loadData();
+dataManager.backupData(); // Create a backup on startuped if used locally
 const fs = require('fs');
 const path = require('path');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');

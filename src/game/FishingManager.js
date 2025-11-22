@@ -167,6 +167,7 @@ class FishingManager {
             data.lastResetTimestamp = Date.now();
             data.users = {};
             dataManager.saveData();
+            dataManager.backupData(); // Backup after reset
 
             const localTime = new Date(Date.now() + (5.5 * 60 * 60 * 1000));
             console.log(`Daily data reset at ${localTime.toLocaleString('en-US', { timeZone: 'UTC' })}`);
