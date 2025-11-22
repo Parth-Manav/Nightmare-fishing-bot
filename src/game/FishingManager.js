@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 const dataManager = require('../data/DataManager');
 const { getDateString, getYesterdayDateString, shouldReset, getDaysDifference } = require('../utils/timeUtils');
 
@@ -100,34 +100,45 @@ class FishingManager {
 
             bestAnglers.sort((a, b) => b.streak - a.streak || b.totalCatches - a.totalCatches);
 
-            let message = '🐠 **Daily Guild Aquarium Contributions** 🐠\n\n';
-            message += `Total Catches today: **${totalCatches}**\n`;
-            if (data.trackedRoleId) {
-                message += `Members who didn't fish: **${missedCount}**\n\n`;
-            }
+            // --- Build Summary Embed ---
+            const summaryEmbed = new EmbedBuilder()
+                .setColor(0xFFD700) // Gold color
+                .setTitle('🐠 Daily Guild Aquarium Contributions')
+                .setDescription('Here is how the pond is doing today!')
+                .addFields(
+                    { name: '🎣 Total Catches Today', value: `**${totalCatches}**`, inline: true },
+                    { name: '😴 Members Missed', value: `**${missedCount}**`, inline: true }
+                )
+                .setTimestamp()
+                .setFooter({ text: 'Stardust Pond Daily Summary' });
 
             if (bestAnglers.length > 0) {
-                message += `**🏆 Best Anglers (${data.bestAnglerStreak}+ Day streak)**\n`;
+                let anglersText = '';
                 for (const angler of bestAnglers) {
-                    message += `・${angler.username} caught ${angler.totalCatches} 🐟, they are on a ${angler.streak} day streak!\n`;
+                    anglersText += `🏆 **${angler.username}**: ${angler.totalCatches} 🐟 (${angler.streak} day streak)\n`;
                 }
-                message += '\n';
+                // Discord field limit is 1024 chars, truncate if needed in future
+                summaryEmbed.addFields({ name: `🔥 Best Anglers (${data.bestAnglerStreak}+ Day Streak)`, value: anglersText || 'None today!' });
             }
 
+            let pingMessage = '';
             if (nonFishers.length > 0) {
-                message += '**Members Who Haven\'t Fished Today 🎣**\n';
                 if (data.pingReminderEnabled) {
-                    message += nonFishers.map(member => `<@${member.id}>`).join(' ');
+                    pingMessage = '**Wake up! You haven\'t fished in a while!** 🎣\n' + nonFishers.map(member => `<@${member.id}>`).join(' ');
                 } else {
                     const nicknames = nonFishers.map(member => member.displayName).join(', ');
-                    message += nicknames;
+                    summaryEmbed.addFields({ name: '🎣 Needs to Fish', value: nicknames });
                 }
-                message += '\n\n';
             }
 
-            message += 'We miss you ❤️ \nPlease remember to fish daily 🙏🏻 Many lovely cats, cosmic dolphins and diamond rewards await us all 💎✨';
+            summaryEmbed.addFields({ name: 'Message', value: 'We miss you ❤️ \nPlease remember to fish daily 🙏🏻 Many lovely cats, cosmic dolphins and diamond rewards await us all 💎✨' });
 
-            await channel.send(message);
+            await channel.send({ embeds: [summaryEmbed] });
+
+            if (pingMessage) {
+                await channel.send(pingMessage);
+            }
+
             console.log('✅ Daily summary posted successfully');
         } catch (error) {
             console.error('Error posting daily summary:', error);
@@ -212,16 +223,24 @@ class FishingManager {
         data.dailyCount++;
 
         const currentStreak = data.persistentUsers[userId].streak;
+        const totalCatches = data.persistentUsers[userId].totalCatches;
         const oldButtonMessageId = data.buttonMessageId;
         const oldButtonChannelId = data.buttonChannelId;
 
-        let replyMessage = `${username} has fished! 🐟🎣 Total catches today: ${data.dailyCount}`;
-        if (currentStreak > 1) {
-            replyMessage += `\n🔥 ${currentStreak} day streak!`;
-        }
+        // --- Build Fish Embed ---
+        const fishEmbed = new EmbedBuilder()
+            .setColor(0x0099FF) // Blue
+            .setTitle('🎣 Catch of the Day!')
+            .setDescription(`**${username}** cast their line and caught a fish! 🐟`)
+            .addFields(
+                { name: '🔥 Streak', value: `${currentStreak} Days`, inline: true },
+                { name: '✨ Total Catches', value: `${totalCatches}`, inline: true }
+            )
+            .setTimestamp()
+            .setFooter({ text: 'Stardust Pond' });
 
         await interaction.reply({
-            content: replyMessage
+            embeds: [fishEmbed]
         });
 
         const row = new ActionRowBuilder()
