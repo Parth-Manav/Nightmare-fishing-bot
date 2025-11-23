@@ -1,6 +1,6 @@
 # Stardust Pond Bot 🎣
 
-A professional Discord bot featuring an interactive daily fishing game. Users can fish once per day, track their streaks, and compete on the leaderboard.
+A Discord bot featuring an interactive daily fishing game. Users can fish once per day, track their streaks, and compete on the leaderboard.
 
 ## Features
 
