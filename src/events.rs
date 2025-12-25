@@ -21,14 +21,6 @@ pub async fn handle_button_interaction(
         .unwrap_or(&interaction.user.name)
         .clone();
 
-    // Check if reset is needed
-    {
-        let data = data_manager.data.read().await;
-        if FishingManager::should_reset(data.last_reset_timestamp) {
-            drop(data);
-            fishing_manager.reset_daily_data(ctx).await;
-        }
-    }
 
     // Call shared fishing logic
     let (current_streak, total_catches, daily_count, old_button_msg, old_button_channel) =
@@ -49,22 +41,6 @@ pub async fn handle_button_interaction(
                         serenity::CreateInteractionResponse::Message(
                             serenity::CreateInteractionResponseMessage::new()
                                 .content("❌ You've already fished today! Come back tomorrow.")
-                                .ephemeral(true),
-                        ),
-                    )
-                    .await?;
-                return Ok(());
-            }
-            Err(FishingError::ResetNeeded) => {
-                fishing_manager.reset_daily_data(ctx).await;
-                interaction
-                    .create_response(
-                        &ctx.http,
-                        serenity::CreateInteractionResponse::Message(
-                            serenity::CreateInteractionResponseMessage::new()
-                                .content(
-                                    "🔄 Day has just reset! Please click the button again now.",
-                                )
                                 .ephemeral(true),
                         ),
                     )

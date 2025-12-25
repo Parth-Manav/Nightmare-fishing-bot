@@ -12,7 +12,6 @@ pub struct FishingManager {
 #[derive(Debug, PartialEq)]
 pub enum FishingError {
     AlreadyFished,
-    ResetNeeded,
     Internal(String),
 }
 
@@ -20,7 +19,6 @@ impl std::fmt::Display for FishingError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             FishingError::AlreadyFished => write!(f, "ALREADY_FISHED"),
-            FishingError::ResetNeeded => write!(f, "RESET_NEEDED"),
             FishingError::Internal(s) => write!(f, "Internal error: {}", s),
         }
     }
@@ -48,12 +46,6 @@ impl FishingManager {
             .to_string()
     }
 
-    pub fn should_reset(last_reset_ms: u64) -> bool {
-        let now = chrono::Utc::now().timestamp_millis() as u64;
-        let last_date = Self::get_date_string(last_reset_ms);
-        let now_date = Self::get_date_string(now);
-        last_date != now_date
-    }
 
     pub fn get_days_difference(date1: &str, date2: &str) -> i64 {
         let d1 = chrono::NaiveDate::parse_from_str(date1, "%Y-%m-%d")
@@ -73,9 +65,6 @@ impl FishingManager {
 
         let mut data = self.data_manager.data.write().await;
 
-        if Self::should_reset(data.last_reset_timestamp) {
-            return Err(FishingError::ResetNeeded);
-        }
 
         if data.users.contains_key(&user_id) {
             return Err(FishingError::AlreadyFished);

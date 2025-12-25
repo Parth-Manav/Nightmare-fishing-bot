@@ -1,4 +1,4 @@
-use crate::game::{FishingError, FishingManager};
+use crate::game::FishingError;
 use crate::{Context, Error};
 use chrono::Utc;
 use poise::serenity_prelude as serenity;
@@ -14,18 +14,6 @@ pub async fn fish(ctx: Context<'_>) -> Result<(), Error> {
         .await
         .and_then(|m| m.nick.clone())
         .unwrap_or_else(|| ctx.author().name.clone());
-
-    // Check if reset is needed
-    {
-        let data = ctx.data().data_manager.data.read().await;
-        if FishingManager::should_reset(data.last_reset_timestamp) {
-            drop(data); // Release read lock before reset
-            ctx.data()
-                .fishing_manager
-                .reset_daily_data(ctx.serenity_context())
-                .await;
-        }
-    }
 
     // Call shared fishing logic
     match ctx
@@ -56,20 +44,6 @@ pub async fn fish(ctx: Context<'_>) -> Result<(), Error> {
             ctx.send(
                 poise::CreateReply::default()
                     .content("❌ You've already fished today! Come back tomorrow.")
-                    .ephemeral(true),
-            )
-            .await?;
-        }
-        Err(FishingError::ResetNeeded) => {
-            // This should rarely happen as we check before calling, but for safety:
-            ctx.data()
-                .fishing_manager
-                .reset_daily_data(ctx.serenity_context())
-                .await;
-            // Retry once? Or just tell user to try again
-            ctx.send(
-                poise::CreateReply::default()
-                    .content("🔄 Day has just reset! Please try fishing again now.")
                     .ephemeral(true),
             )
             .await?;
