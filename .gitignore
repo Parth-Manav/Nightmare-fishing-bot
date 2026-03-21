@@ -1,0 +1,5 @@
+/target
+/fishing_data.json
+/backups/
+.env
+/legacy_js/
