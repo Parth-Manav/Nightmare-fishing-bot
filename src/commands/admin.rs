@@ -13,7 +13,6 @@ pub async fn fishsetup(ctx: Context<'_>) -> Result<(), Error> {
             poise::CreateReply::default()
                 .content("🎣 Welcome to Stardust Pond — click to fish!")
                 .components(vec![row])
-                .ephemeral(true),
         )
         .await?;
 

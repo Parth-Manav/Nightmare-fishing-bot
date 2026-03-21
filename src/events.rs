@@ -63,14 +63,23 @@ pub async fn handle_button_interaction(
         .timestamp(Utc::now())
         .footer(serenity::CreateEmbedFooter::new("Stardust Pond"));
 
+    let row = serenity::CreateActionRow::Buttons(vec![serenity::CreateButton::new("fish_button")
+        .label("🎣 Fish!")
+        .style(serenity::ButtonStyle::Primary)]);
+
     interaction
         .create_response(
             &ctx.http,
             serenity::CreateInteractionResponse::Message(
-                serenity::CreateInteractionResponseMessage::new().embed(fish_embed),
+                serenity::CreateInteractionResponseMessage::new()
+                    .embed(fish_embed)
+                    .components(vec![row]),
             ),
         )
         .await?;
+
+    // Delete the old message so the button jumps to the bottom
+    let _ = interaction.message.delete(&ctx.http).await;
 
     Ok(())
 }
