@@ -63,14 +63,42 @@ pub async fn handle_button_interaction(
         .timestamp(Utc::now())
         .footer(serenity::CreateEmbedFooter::new("Stardust Pond"));
 
-    interaction
+    // 1. Acknowledge the interaction so the button stops loading (no reply arrow!)
+    let _ = interaction
         .create_response(
             &ctx.http,
-            serenity::CreateInteractionResponse::Message(
-                serenity::CreateInteractionResponseMessage::new().embed(fish_embed),
-            ),
+            serenity::CreateInteractionResponse::Acknowledge,
+        )
+        .await;
+
+    // 2. Send the user's catch information embed as a normal message
+    interaction
+        .channel_id
+        .send_message(
+            &ctx.http,
+            serenity::CreateMessage::new().embed(fish_embed),
         )
         .await?;
+
+    // 3. Recreate and send the new "Welcome to Stardust Pond" button prompt
+    let row = serenity::CreateActionRow::Buttons(vec![serenity::CreateButton::new(
+        "fish_button",
+    )
+    .label("🎣 Fish!")
+    .style(serenity::ButtonStyle::Primary)]);
+
+    interaction
+        .channel_id
+        .send_message(
+            &ctx.http,
+            serenity::CreateMessage::new()
+                .content("🎣 Welcome to Stardust Pond — click to fish!")
+                .components(vec![row]),
+        )
+        .await?;
+
+    // 4. Delete the old button message to effectively "jump" it to the bottom
+    let _ = interaction.message.delete(&ctx.http).await;
 
     Ok(())
 }
