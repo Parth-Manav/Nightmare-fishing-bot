@@ -1,5 +1,4 @@
-use crate::game::FishingError;
-use crate::{Context, Error};
+use crate::{BotError, Context, Error};
 use chrono::Utc;
 use poise::serenity_prelude as serenity;
 
@@ -19,7 +18,11 @@ pub async fn fish(ctx: Context<'_>) -> Result<(), Error> {
     match ctx
         .data()
         .fishing_manager
-        .handle_fishing(user_id, username.clone())
+        .handle_fishing(
+            user_id,
+            username.clone(),
+            ctx.guild_id().map(|id| id.to_string()),
+        )
         .await
     {
         Ok((current_streak, total_catches, daily_count)) => {
@@ -28,19 +31,18 @@ pub async fn fish(ctx: Context<'_>) -> Result<(), Error> {
                 .color(0x0099FF)
                 .title("🎣 Catch of the Day!")
                 .description(format!(
-                    "**{}** cast their line and caught a fish! 🐟",
-                    username
+                    "**{username}** cast their line and caught a fish! 🐟"
                 ))
                 .thumbnail(ctx.author().face())
-                .field("🔥 Streak", format!("{} Days", current_streak), true)
-                .field("✨ Total Catches", format!("{}", total_catches), true)
-                .field("🌍 Total Catches Today", format!("{}", daily_count), true)
+                .field("🔥 Streak", format!("{current_streak} Days"), true)
+                .field("✨ Total Catches", total_catches.to_string(), true)
+                .field("🌍 Total Catches Today", daily_count.to_string(), true)
                 .timestamp(Utc::now())
                 .footer(serenity::CreateEmbedFooter::new("Stardust Pond"));
 
             ctx.send(poise::CreateReply::default().embed(embed)).await?;
         }
-        Err(FishingError::AlreadyFished) => {
+        Err(BotError::State(message)) if message == "ALREADY_FISHED" => {
             ctx.send(
                 poise::CreateReply::default()
                     .content("❌ You've already fished today! Come back tomorrow.")
@@ -48,7 +50,7 @@ pub async fn fish(ctx: Context<'_>) -> Result<(), Error> {
             )
             .await?;
         }
-        Err(e) => return Err(e.into()),
+        Err(e) => return Err(e),
     }
 
     Ok(())

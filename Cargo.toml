@@ -1,16 +1,27 @@
 [package]
 name = "stardust-pond-bot"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
+authors = ["Parth Manav <parthmanav546@gmail.com>"]
+description = "Production-grade async Discord bot in Rust - concurrent state management, atomic persistence, and cron-scheduled automation"
+keywords = ["discord", "bot", "tokio", "async", "automation"]
+categories = ["network-programming", "asynchronous"]
+license = "MIT"
+repository = "https://github.com/Parth-Manav/Nightmare-fishing-bot"
+readme = "README.md"
 
 [dependencies]
-poise = "0.6.1"
-tokio = { version = "1.33.0", features = ["macros", "rt-multi-thread", "fs"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-chrono = { version = "0.4", features = ["serde"] }
-tokio-cron-scheduler = "0.9"
-dotenvy = "0.15"
-tracing = "0.1"
-tracing-subscriber = "0.3"
-rand = "0.8"
+poise = "0.6.1" # Discord slash command framework built on Serenity
+tokio = { version = "1.33.0", features = ["macros", "rt-multi-thread", "fs"] } # async runtime, task scheduling, async filesystem APIs
+serde = { version = "1.0", features = ["derive"] } # serialization derives for persisted bot state
+serde_json = "1.0" # JSON persistence format for fishing_data.json
+thiserror = "1" # typed error enum implementation for BotError
+chrono = { version = "0.4", features = ["serde"] } # UTC date/time calculations and fishing-day boundaries
+tokio-cron-scheduler = "0.9" # cron-scheduled daily reset automation
+dotenvy = "0.15" # local .env configuration loading
+tracing = { version = "0.1", features = ["attributes"] } # structured logs and instrumentation spans
+tracing-subscriber = { version = "0.3", features = ["env-filter"] } # tracing subscriber with RUST_LOG/EnvFilter support
+rand = "0.8" # deterministic-style simulation helpers and future game randomness support
+
+[dev-dependencies]
+tempfile = "3" # isolated temporary directories for persistence and concurrency tests

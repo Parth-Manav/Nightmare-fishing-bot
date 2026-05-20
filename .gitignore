@@ -3,3 +3,6 @@
 /backups/
 .env
 /legacy_js/
+/.cargo/
+/bot.stdout.log
+/bot.stderr.log

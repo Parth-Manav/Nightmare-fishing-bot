@@ -12,7 +12,7 @@ pub async fn fishsetup(ctx: Context<'_>) -> Result<(), Error> {
         .send(
             poise::CreateReply::default()
                 .content("🎣 Welcome to Stardust Pond — click to fish!")
-                .components(vec![row])
+                .components(vec![row]),
         )
         .await?;
 
@@ -69,10 +69,12 @@ pub async fn setreminderthreshold(
     }
     ctx.data().data_manager.save().await?;
 
-    ctx.send(poise::CreateReply::default()
-        .content(format!("✅ Inactivity threshold set to **{} days**. Members will be pinged if they haven't fished for {} days or more.", days, days))
-        .ephemeral(true))
-        .await?;
+    ctx.send(
+        poise::CreateReply::default()
+            .content(format!("✅ Inactivity threshold set to **{days} days**. Members will be pinged if they haven't fished for {days} days or more."))
+            .ephemeral(true),
+    )
+    .await?;
 
     Ok(())
 }
@@ -211,7 +213,7 @@ pub async fn fishsummary(ctx: Context<'_>) -> Result<(), Error> {
 
         let fished: Vec<String> = data.users.keys().cloned().collect();
         drop(data);
-        (role_id, format!("{}", role_id), fished)
+        (role_id, role_id.to_string(), fished)
     };
 
     // Fetch guild via HTTP to get role info
@@ -235,7 +237,10 @@ pub async fn fishsummary(ctx: Context<'_>) -> Result<(), Error> {
         if page.is_empty() {
             break;
         }
-        after = Some(page.last().unwrap().user.id);
+        let Some(last_member) = page.last() else {
+            break;
+        };
+        after = Some(last_member.user.id);
         members.extend(page);
     }
 
@@ -261,7 +266,7 @@ pub async fn fishsummary(ctx: Context<'_>) -> Result<(), Error> {
 
     let mentions = non_fishers
         .iter()
-        .map(|id| format!("<@{}>", id))
+        .map(|id| format!("<@{id}>"))
         .collect::<Vec<_>>()
         .join("\n");
 
